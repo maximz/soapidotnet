@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("SOApiDotNetTester")]
 [assembly: AssemblyDescription("Tests SOApiDotNet")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Maxim Zaslavsky.")]
+[assembly: AssemblyCompany("Maxim Zaslavsky")]
 [assembly: AssemblyProduct("SOApiDotNetTester")]
-[assembly: AssemblyCopyright("Released under the General Public License v3.")]
+[assembly: AssemblyCopyright("Copyright 2009 Maxim Zaslavsky. Released under the General Public License v3.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

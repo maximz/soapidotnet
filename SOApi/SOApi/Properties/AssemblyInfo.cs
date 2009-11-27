@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("SOApiDotNet")]
 [assembly: AssemblyDescription("A .NET library for the Stack Overflow API.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Maxim Zaslavsky.")]
+[assembly: AssemblyCompany("Maxim Zaslavsky")]
 [assembly: AssemblyProduct("SOApiDotNet")]
-[assembly: AssemblyCopyright("Released under the General Public License v3.")]
+[assembly: AssemblyCopyright("Copyright 2009 Maxim Zaslavsky. Released under the General Public License v3.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
