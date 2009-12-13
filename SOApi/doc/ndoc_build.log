@@ -1,0 +1,31 @@
+Memory before build: 4002796
+Initializing Workspace
+Creating Help Project Resources
+Analyzing Assemblies & Merging XML Documentation
+Memory making xml: 4235488
+AssemblyLoader: Loading "C:\Users\Maxim\Desktop\soapidotnet\SOApi\SOApi\bin\Release\SOApiDotNet.dll".
+XmlDocCommentLoader: Loaded 'C:\Users\Maxim\Desktop\soapidotnet\SOApi\SOApi\bin\Release\SOApiDotNet.xml' (0.225 sec.)
+XmlDocCommentLoader: Cache 65
+Docs found : C:\Windows\Microsoft.NET\Framework\v2.0.50727\en\mscorlib.xml
+XmlDocCommentLoader: Loaded 'C:\Windows\Microsoft.NET\Framework\v2.0.50727\en\mscorlib.xml' (2.401 sec.)
+XmlDocCommentLoader: Cache 14261
+XmlDocCommentLoader: Loaded 'C:\Users\Maxim\Desktop\NDoc2-Alpha3u-fix\Configuration\Supplemental Docs\en\mscorlib.xml' (0.066 sec.)
+XmlDocCommentLoader: Cache 15283
+Writing namespace SOApiDotNet...
+    Wrote 9 classes.
+    Wrote 2 enumerations.
+Completed SOApiDotNet, Version=0.2.0.0, Culture=neutral, PublicKeyToken=null
+0.321 sec.
+MakeXML : 3.485 sec.
+Determining Document Structure
+Load Docs for Structure Production: 4.563 msec.
+Building File Map: 0.562 msec.
+Structure Production: 1.911 msec.
+Initializing Documenter
+Building Table-of-Contents
+Building Topic Pages
+It took 5 seconds to make the html
+Completing Help Project Resources
+Writing documentation to output path
+Build Completed.
+The build took a total of 13 seconds

@@ -1,0 +1,3 @@
+information QA1004: blank or 'noise' <returns> tag ignored for member: "M:SOApiDotNet.StackOverflow.GetUserFavorites(System.Int64,SOApiDotNet.TrilogySite)"
+warning QA1009: Duplicate <param name="obj"> tag for member : "M:System.Reflection.CustomAttributeData.Equals(System.Object)" , previous comments overriden.
+warning QA1009: Duplicate <param name="rank"> tag for member : "M:System.Reflection.Emit.EnumBuilder.MakeArrayType(System.Int32)" , previous comments overriden.
