@@ -1,26 +1,26 @@
-﻿/*  Copyright 2009 Maxim Zaslavsky.
+﻿/*  Copyright 2009 Maxim Zaslavsky. All Rights Reserved.
  * 
  *  This file is part of SOApiDotNet.
 
-    SOApiDotNet is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+    Copyright (c) 2009, Maxim Zaslavsky
+All rights reserved.
 
-    SOApiDotNet is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
-    You should have received a copy of the GNU General Public License
-    along with SOApiDotNet.  If not, see <http://www.gnu.org/licenses/>.
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+Neither the name of SOApiDotNet nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  *  For more information about SOApiDotNet, please visit <http://code.google.com/p/soapidotnet/>.
  * 
+ * This software uses the following libraries:
  * 
- * 
+ * RSS.NET - Copyright © 2002-2005 ToolButton Inc.. All Rights Reserved.
+ * JSON.NET - Copyright (c) 2007 James Newton-King.
  * 
  * */
+
 
 using System;
 using System.Collections.Generic;
@@ -31,7 +31,7 @@ namespace SOApiDotNet
     /// <summary>
     /// Represents a post on Stack Overflow (question, answer, or comment).
     /// </summary>
-    public class Post
+    public class SOPost
     {
         /// <summary>
         /// Id (link)
@@ -40,7 +40,7 @@ namespace SOApiDotNet
         /// <summary>
         /// Number of votes.
         /// </summary>
-        public double VoteCount { get; set; }
+        public int VoteCount { get; set; }
         /// <summary>
         /// Number of views.
         /// </summary>
@@ -50,49 +50,13 @@ namespace SOApiDotNet
         /// </summary>
         public string Title { get; set; }
         /// <summary>
-        /// Created date of the post (expressed as a Unix timestamp)
-        /// </summary>
-        public string CreatedDate
-        {
-
-            get
-            {
-                return CreatedDate;
-            }
-            set
-            {
-                CreatedDate = value;
-                dtCreatedDate = StackOverflow.ConvertFromUnixTimestamp(StackOverflow.ExtractTimestampFromJsonTime(value));
-
-            }
-
-        }
-        /// <summary>
         /// Created date of the post (expressed as a DateTime)
         /// </summary>
-        public DateTime dtCreatedDate { get; set; }
-        /// <summary>
-        /// Last edit date of the post (expressed as a Unix timestamp)
-        /// </summary>
-        public string LastEditDate
-        {
-
-            get
-            {
-                return LastEditDate;
-            }
-            set
-            {
-                LastEditDate = value;
-                dtLastEditDate = StackOverflow.ConvertFromUnixTimestamp(StackOverflow.ExtractTimestampFromJsonTime(value));
-
-            }
-
-        }
+        public DateTime CreatedDate { get; set; }
         /// <summary>
         /// Last edit date of the post (expressed as a DateTime)
         /// </summary>
-        public DateTime dtLastEditDate { get; set; }
+        public DateTime LastEditDate { get; set; }
         /// <summary>
         /// Author of the post.
         /// </summary>
@@ -105,16 +69,13 @@ namespace SOApiDotNet
         /// URL of the post.
         /// </summary>
         public string Link { get; set; }
-        /// <summary>
-        /// RSS Categories (or tags) of the post.
-        /// </summary>
-        public List<string> Categories { get; set; }
+
 
     }
     /// <summary>
     /// Represents a favorite question.
     /// </summary>
-    public class SOFavorite : Question
+    public class SOFavorite : SOQuestion
     {
 
     }
@@ -122,7 +83,7 @@ namespace SOApiDotNet
     /// <summary>
     /// Represents a change in reputation for a user.
     /// </summary>
-    public class RepChange
+    public class SORepChange
     {
         /// <summary>
         /// Url of the post.
@@ -133,18 +94,14 @@ namespace SOApiDotNet
         /// </summary>
         public string PostTitle { get; set; }
         /// <summary>
-        /// Rep gained through the post.
+        /// Rep change from the post.
         /// </summary>
-        public double RepPositive { get; set; }
-        /// <summary>
-        /// Rep lost through the post.
-        /// </summary>
-        public double RepNegative { get; set; }
+        public double Rep { get; set; }
     }
     /// <summary>
     /// Represents a user's flair (stats).
     /// </summary>
-    public class UserFlair
+    public class SOUserFlair
     {
         /// <summary>
         /// User id
@@ -174,7 +131,7 @@ namespace SOApiDotNet
     /// <summary>
     /// Represents a user's questions (on one page).
     /// </summary>
-    public class UserQuestions
+    public class SOUserQuestions
     {
         /// <summary>
         /// Page #.
@@ -187,7 +144,7 @@ namespace SOApiDotNet
         /// <summary>
         /// List of questions on this page.
         /// </summary>
-        public List<Question> Posts { get; set; }
+        public List<SOQuestion> Posts { get; set; }
 
 
 
@@ -195,8 +152,32 @@ namespace SOApiDotNet
     /// <summary>
     /// Represents a question.
     /// </summary>
-    public class Question : Post //TODO: Have Question and Answer derive from Post
+    public class SOQuestion : SOPost
     {
+        public SOQuestion()
+        {
+                //...
+        }
+
+        public SOQuestion(SOPost p)
+        {
+            this.Id=p.Id;
+            this.Author = p.Author;
+            this.CreatedDate = p.CreatedDate;
+            this.LastEditDate = p.LastEditDate;
+            this.Link = p.Link;
+            this.Summary = p.Summary;
+            this.Title = p.Title;
+            this.ViewCount = p.ViewCount; //TODO: ViewCount is only for Questions, not all Posts
+            this.VoteCount = p.VoteCount;
+                // copy stuff to 'this'
+        }
+
+        //public static implicit operator SOQuestion(SOPost p)
+        //{
+        //        SOQuestion q = new SOQuestion(p);
+        //        return q;
+        //}
  
         /// <summary>
         /// # of favorites.
@@ -207,17 +188,22 @@ namespace SOApiDotNet
         /// # of answers.
         /// </summary>
         public double AnswerCount { get; set; }
-        
+
+
         /// <summary>
         /// Tags.
         /// </summary>
-        public string Tags { get; set; }
+        public string Tags
+        {
+            get;
+            set;
+        }
 
     }
     /// <summary>
     /// Represents a user's answers (on one page).
     /// </summary>
-    public class UserAnswers
+    public class SOUserAnswers
     {
         /// <summary>
         /// Page #.
@@ -230,7 +216,7 @@ namespace SOApiDotNet
         /// <summary>
         /// List of answers on this page.
         /// </summary>
-        public List<Answer> Posts { get; set; }
+        public List<SOAnswer> Posts { get; set; }
 
 
 
@@ -238,7 +224,7 @@ namespace SOApiDotNet
     /// <summary>
     /// Represents an answer.
     /// </summary>
-    public class Answer : Post
+    public class SOAnswer : SOPost
     {
         /// <summary>
         /// Whether this answer is the accepted one for this question or not.

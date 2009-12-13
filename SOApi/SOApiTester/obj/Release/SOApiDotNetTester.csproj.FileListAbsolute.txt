@@ -1,0 +1,13 @@
+C:\Users\Maxim\Desktop\soapidotnet\SOApi\SOApiTester\bin\Release\COPYING
+C:\Users\Maxim\Desktop\soapidotnet\SOApi\SOApiTester\bin\Release\LICENSE
+C:\Users\Maxim\Desktop\soapidotnet\SOApi\SOApiTester\bin\Release\SOApiDotNetTester.exe
+C:\Users\Maxim\Desktop\soapidotnet\SOApi\SOApiTester\bin\Release\SOApiDotNetTester.pdb
+C:\Users\Maxim\Desktop\soapidotnet\SOApi\SOApiTester\bin\Release\SOApiDotNet.dll
+C:\Users\Maxim\Desktop\soapidotnet\SOApi\SOApiTester\bin\Release\Newtonsoft.Json.dll
+C:\Users\Maxim\Desktop\soapidotnet\SOApi\SOApiTester\bin\Release\Newtonsoft.Json.pdb
+C:\Users\Maxim\Desktop\soapidotnet\SOApi\SOApiTester\bin\Release\Newtonsoft.Json.xml
+C:\Users\Maxim\Desktop\soapidotnet\SOApi\SOApiTester\bin\Release\SOApiDotNet.pdb
+C:\Users\Maxim\Desktop\soapidotnet\SOApi\SOApiTester\bin\Release\SOApiDotNet.xml
+C:\Users\Maxim\Desktop\soapidotnet\SOApi\SOApiTester\obj\Release\ResolveAssemblyReference.cache
+C:\Users\Maxim\Desktop\soapidotnet\SOApi\SOApiTester\obj\Release\SOApiDotNetTester.exe
+C:\Users\Maxim\Desktop\soapidotnet\SOApi\SOApiTester\obj\Release\SOApiDotNetTester.pdb

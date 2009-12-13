@@ -1,24 +1,23 @@
-﻿/*  Copyright 2009 Maxim Zaslavsky.
+﻿/*  Copyright 2009 Maxim Zaslavsky. All Rights Reserved.
  * 
  *  This file is part of SOApiDotNet.
 
-    SOApiDotNet is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+    Copyright (c) 2009, Maxim Zaslavsky
+All rights reserved.
 
-    SOApiDotNet is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
-    You should have received a copy of the GNU General Public License
-    along with SOApiDotNet.  If not, see <http://www.gnu.org/licenses/>.
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+Neither the name of SOApiDotNet nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  *  For more information about SOApiDotNet, please visit <http://code.google.com/p/soapidotnet/>.
  * 
+ * This software uses the following libraries:
  * 
- * 
+ * RSS.NET - Copyright © 2002-2005 ToolButton Inc.. All Rights Reserved.
+ * JSON.NET - Copyright (c) 2007 James Newton-King.
  * 
  * */
 
@@ -32,7 +31,8 @@ using System.IO;
 using System.Xml;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Utilities;
-using Web20Tools.Feed.Rss;
+using System.ServiceModel.Syndication;
+
 
 namespace SOApiDotNet
 {
@@ -50,7 +50,7 @@ namespace SOApiDotNet
         /// </summary>
         SF,
         /// <summary>
-        /// superuesr.com
+        /// superuser.com
         /// </summary>
         SU,
         /// <summary>
@@ -99,9 +99,8 @@ namespace SOApiDotNet
             if (string.IsNullOrEmpty(username))
             {
                 throw new ApplicationException("Please enter a username to find userids for it.");
-                return null;
             }
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://"+GetSiteUrl(site)+".com/users/filter/" + Uri.EscapeUriString(username));
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://"+GetSiteUrl(site)+".com/users/filter/" + Uri.EscapeUriString(username.ToLower()));
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             int currentindex = 0;
             string html = new StreamReader(response.GetResponseStream()).ReadToEnd();
@@ -114,16 +113,26 @@ namespace SOApiDotNet
 
             string intermediary1 = html.Substring(html.IndexOf("<a", currentindex), html.IndexOf("</a>", currentindex) - html.IndexOf("<a", currentindex) + 1);
             currentindex = intermediary1.IndexOf("href=\"/users/");
-            string strId = intermediary1.Substring(currentindex + 13, intermediary1.IndexOf("/", currentindex + 13) - currentindex + 13);
+            int iaf = intermediary1.IndexOf("/", currentindex + 14);
+            iaf -= currentindex;
+            iaf -= 13;
+            string strId = intermediary1.Substring(currentindex + 13, iaf);
             long lId = long.Parse(strId);
             userids.Add(lId);
+            currentindex = html.IndexOf("<div class=\"user-details\">") + 1;
             while (html.IndexOf("<div class=\"user-details\">", currentindex) != -1)
             {
-                intermediary1 = html.Substring(html.IndexOf("<a", html.IndexOf("<div class=\"user-details\">", currentindex), html.IndexOf("</a>", html.IndexOf("<div class=\"user-details\">", currentindex) - html.IndexOf("<a", html.IndexOf("<div class=\"user-details\">", currentindex) + 1))));
+                int currentindexbackup = currentindex;
+                int i1 = html.IndexOf("<a", html.IndexOf("<div class=\"user-details\">", currentindex)); //finds a in user-details of that user
+                intermediary1 = html.Substring(i1, html.IndexOf("</a>", html.IndexOf("<div class=\"user-details\">", currentindex)) - i1 + 1);
                 currentindex = intermediary1.IndexOf("href=\"/users/");
-                strId = intermediary1.Substring(currentindex + 13, intermediary1.IndexOf("/", currentindex + 13) - currentindex + 13);
+                iaf = intermediary1.IndexOf("/", currentindex + 14);
+                iaf -= currentindex;
+                iaf -= 13;
+                strId = intermediary1.Substring(currentindex + 13, iaf);
                 lId = long.Parse(strId);
                 userids.Add(lId);
+                currentindex = html.IndexOf("<div class=\"user-details\">", currentindexbackup+1) + 1; // do we need the first +1?
             }
             return userids;
         }
@@ -142,8 +151,7 @@ namespace SOApiDotNet
             //List<SOFavorite> result = new List<SOFavorite>();
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(string.Format("http://{4}.com/api/userfavorites.json?userid={0}&page={1}&pagesize={2}&sort={3}",userid, page, pagesize, sort, GetSiteUrl(site)));
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            List<SOFavorite> fav = (List<SOFavorite>)new JsonSerializer().Deserialize(new JsonReader((TextReader)new StreamReader(response.GetResponseStream())));
-            //Do the JSON magic!
+            List<SOFavorite> fav = JsonConvert.DeserializeObject<List<SOFavorite>>(new StreamReader(response.GetResponseStream()).ReadToEnd()); //(List<SOFavorite>)new JsonSerializer().Deserialize(new JsonReader((TextReader)new StreamReader(response.GetResponseStream())));
 
             return fav;
         }
@@ -163,26 +171,25 @@ namespace SOApiDotNet
         /// Obtains reputation changes for a user.
         /// </summary>
         /// <param name="userid">Id of the user.</param>
-        /// <param name="fromtime">Starting time, expressed as a DateTime.</param>
-        /// <param name="totime">Ending time, expressed as a DateTime.</param>
+        /// <param name="fromtime">Starting time, expressed as a double (Unix timestamp).</param>
+        /// <param name="totime">Ending time, expressed as a double (Unix timestamp).</param>
         /// <param name="site">Trilogy site in question.</param>
         /// <returns>A list of RepChange's for the user.</returns>
-        public static List<RepChange> UserReputationGraph(long userid, DateTime fromtime, DateTime totime, TrilogySite site) { return UserReputationGraph(userid, ConvertToUnixTimestamp(fromtime), ConvertToUnixTimestamp(totime), site); }
+        public static List<SORepChange> UserReputationGraph(long userid, double fromtime, double totime, TrilogySite site) { return UserReputationGraph(userid, ConvertFromUnixTimestamp(fromtime), ConvertFromUnixTimestamp(totime), site); }
 
         /// <summary>
         /// Obtains reputation changes for a user.
         /// </summary>
         /// <param name="userid">Id of the user.</param>
-        /// <param name="fromtime">Starting time, expressed as a double (Unix timestamp).</param>
-        /// <param name="totime">Ending time, expressed as a double (Unix timestamp).</param>
+        /// <param name="fromtime">Starting time, expressed as a DateTime. Maximum of 90 days between this and ending time is allowed.</param>
+        /// <param name="totime">Ending time, expressed as a DateTime. Maximum of 90 days between this and starting time is allowed.</param>
         /// <param name="site">Trilogy site in question.</param>
         /// <returns>A list of RepChange's for the user.</returns>
-        public static List<RepChange> UserReputationGraph (long userid, double fromtime, double totime, TrilogySite site)
+        public static List<SORepChange> UserReputationGraph (long userid, DateTime fromtime, DateTime totime, TrilogySite site)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(string.Format("http://{3}.com/users/rep-graph/{0}/{1}/{2}", userid, fromtime, totime, GetSiteUrl(site)));
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(string.Format("http://{3}.com/users/rep/{0}/{1}/{2}", userid, fromtime.ToString("yyyy-MM-dd"), totime.ToString("yyyy-MM-dd"), GetSiteUrl(site)));
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            List<RepChange> forret = (List<RepChange>)new JsonSerializer().Deserialize(new JsonReader((TextReader)new StreamReader(response.GetResponseStream())));
-            //Do the JSON magic!
+            List<SORepChange> forret = JsonConvert.DeserializeObject<List<SORepChange>>(new StreamReader(response.GetResponseStream()).ReadToEnd()); //(List<RepChange>)new JsonSerializer().Deserialize(new JsonReader((TextReader)new StreamReader(response.GetResponseStream())));
 
             return forret;
         }
@@ -193,12 +200,11 @@ namespace SOApiDotNet
         /// <param name="userid">Id of the user.</param>
         /// <param name="site">Trilogy site in question.</param>
         /// <returns>Flair details, expressed through an object of type UserFlair.</returns>
-        public static UserFlair GetUserFlair(long userid, TrilogySite site)
+        public static SOUserFlair GetUserFlair(long userid, TrilogySite site)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(string.Format("http://{1}.com/users/flair/{0}.json", userid, GetSiteUrl(site)));
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            UserFlair forret = (UserFlair)new JsonSerializer().Deserialize(new JsonReader((TextReader)new StreamReader(response.GetResponseStream())));
-            //Do the JSON magic!
+            SOUserFlair forret = JsonConvert.DeserializeObject<SOUserFlair>(new StreamReader(response.GetResponseStream()).ReadToEnd()); //(UserFlair)new JsonSerializer().Deserialize(new JsonReader((TextReader)new StreamReader(response.GetResponseStream())));
 
             return forret;
         }
@@ -212,12 +218,11 @@ namespace SOApiDotNet
         /// <param name="sort">SortRule.</param>
         /// <param name="site">Trilogy site in question.</param>
         /// <returns>An object of type UserQuestions which represents the questions of the user in question.</returns>
-        public static UserQuestions GetUserQuestions(long userid, int page, int pagesize, SortRule sort, TrilogySite site)
+        public static SOUserQuestions GetUserQuestions(long userid, int page, int pagesize, SortRule sort, TrilogySite site)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(string.Format("http://{4}.com/api/userquestions.json?userid={0}&page={1}&pagesize={2}&sort={3}", userid, page, pagesize, sort.ToString(), GetSiteUrl(site)));
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            UserQuestions forret = (UserQuestions)new JsonSerializer().Deserialize(new JsonReader((TextReader)new StreamReader(response.GetResponseStream())));
-            //Do the JSON magic!
+            SOUserQuestions forret = JsonConvert.DeserializeObject<SOUserQuestions>(new StreamReader(response.GetResponseStream()).ReadToEnd());//(UserQuestions)new JsonSerializer().Deserialize(new JsonReader((TextReader)new StreamReader(response.GetResponseStream())));
 
             return forret;
         }
@@ -231,12 +236,11 @@ namespace SOApiDotNet
         /// <param name="sort">SortRule.</param>
         /// <param name="site">Trilogy site in question.</param>
         /// <returns>An object of type UserAnswers which represents the answers of the user in question.</returns>
-        public static UserAnswers GetUserAnswers (long userid, int page, int pagesize, SortRule sort, TrilogySite site)
+        public static SOUserAnswers GetUserAnswers (long userid, int page, int pagesize, SortRule sort, TrilogySite site)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(string.Format("http://{4}.com/api/useranswers.json?userid={0}&page={1}&pagesize={2}&sort={3}", userid, page, pagesize, sort.ToString(), GetSiteUrl(site)));
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            UserAnswers forret = (UserAnswers)new JsonSerializer().Deserialize(new JsonReader((TextReader)new StreamReader(response.GetResponseStream())));
-            //Do the JSON magic!
+            SOUserAnswers forret = JsonConvert.DeserializeObject<SOUserAnswers>(new StreamReader(response.GetResponseStream()).ReadToEnd());//(UserAnswers)new JsonSerializer().Deserialize(new JsonReader((TextReader)new StreamReader(response.GetResponseStream())));
 
             return forret;
         }
@@ -248,27 +252,53 @@ namespace SOApiDotNet
         /// </summary>
         /// <param name="site">Trilogy site in question.</param>
         /// <returns>A list of objects of type Question, which represents the recent questions on a trilogy site.</returns>
-        public static List<Question> GetRecentQuestions(TrilogySite site)
+        public static List<SOQuestion> GetRecentQuestions(TrilogySite site)
         {
-            List<Question> RecentQuestions = new List<Question>();
-            RssFeed feed = RssFeed.Load(string.Format("http://{0}.com/feeds",GetSiteUrl(site)));
-            RssChannel channel = (RssChannel)feed.Channels[0];
-            foreach (RssItem item in channel.Items)
+            List<SOQuestion> RecentQuestions = new List<SOQuestion>();
+            // load the raw feed
+            using (var xmlr = XmlReader.Create(string.Format("http://{0}.com/feeds", GetSiteUrl(site))))
             {
-                Question toadd = new Question();
-                foreach(RssCategory cat in item.Categories)
+                // get the items within a feed
+                var feedItems = SyndicationFeed
+                                    .Load(xmlr)
+                                    .GetRss20Formatter()
+                                    .Feed
+                                    .Items;
+
+                // print out details about each item in the feed
+                foreach (var item in feedItems)
                 {
-                    toadd.Categories.Add(cat.Name);
+                    SOQuestion toaddquestion = new SOQuestion();
+                    toaddquestion.Title = item.Title.Text;
+                    toaddquestion.Author = item.Authors[0].Name;
+                    toaddquestion.Id = item.Id;
+                    //toaddquestion.Categories = item.Categories;
+                    toaddquestion.CreatedDate = item.PublishDate.UtcDateTime;
+                    toaddquestion.LastEditDate = item.LastUpdatedTime.UtcDateTime;
+                    toaddquestion.Link = item.Id;
+                    toaddquestion.Summary = item.Summary.Text;
+                    foreach (SyndicationCategory cat in item.Categories)
+                    {
+                        toaddquestion.Tags+=cat.Name+",";
+
+
+                    }
+                    toaddquestion.Tags.Remove(toaddquestion.Tags.LastIndexOf(','));
+                    
+                    
+                    // the extensions assume that there can be more than one value, so get
+                    // the first or default value (default == 0)
+                    int rank = item.ElementExtensions
+                                    .ReadElementExtensions<int>("rank", "http://purl.org/atompub/rank/1.0")[0];
+
+                    toaddquestion.VoteCount = rank;
+
+
+                    RecentQuestions.Add(toaddquestion);
+                    toaddquestion = null;
                 }
-                toadd.Author = item.Author;
-                toadd.CreatedDate = ConvertToUnixTimestamp(item.PubDate).ToString();
-                toadd.Id = item.Link.Url.ToString();
-                toadd.Link = item.Link.Url.ToString();
-                toadd.Summary = item.Description;
-                
-                //TODO: OTHER PROPERTIES
-                RecentQuestions.Add(toadd);
             }
+            
             return RecentQuestions;
         }
 
@@ -278,27 +308,72 @@ namespace SOApiDotNet
         /// <param name="userid">Userid of the user in question</param>
         /// <param name="site">Trilogy site in question</param>
         /// <returns>The user's recent activity, expressed in a list of Posts.</returns>
-        public static List<Post> GetRecentActivity(long userid, TrilogySite site)
+        public static List<SOPost> GetRecentActivity(long userid, TrilogySite site)
         {
-            List<Post> Activity = new List<Post>();
-            RssFeed feed = RssFeed.Load(string.Format("http://{0}.com/feeds/user/{1}",GetSiteUrl(site),userid));
-            RssChannel channel = (RssChannel)feed.Channels[0];
-            foreach (RssItem item in channel.Items)
+            List<SOPost> Activity = new List<SOPost>();
+            // load the raw feed
+            using (var xmlr = XmlReader.Create(string.Format("http://{0}.com/feeds/user/{1}", GetSiteUrl(site), userid)))
             {
-                Post toadd = new Post();
-                foreach (RssCategory cat in item.Categories)
-                {
-                    toadd.Categories.Add(cat.Name);
-                }
-                toadd.Author = item.Author;
-                toadd.CreatedDate = ConvertToUnixTimestamp(item.PubDate).ToString();
-                toadd.Id = item.Link.Url.ToString();
-                toadd.Link = item.Link.Url.ToString();
-                toadd.Summary = item.Description;
+                // get the items within a feed
+                var feedItems = SyndicationFeed
+                                    .Load(xmlr)
+                                    .GetRss20Formatter()
+                                    .Feed
+                                    .Items;
 
-                //TODO: OTHER PROPERTIES
-                Activity.Add(toadd);
+                // print out details about each item in the feed
+                foreach (var item in feedItems)
+                {
+                    SOPost toadd = new SOPost();
+                    toadd.Title = item.Title.Text;
+                    toadd.Author = item.Authors[0].Name;
+                    toadd.Id = item.Id;
+                    toadd.CreatedDate = item.PublishDate.UtcDateTime;
+                    toadd.LastEditDate = item.LastUpdatedTime.UtcDateTime;
+                    toadd.Link = item.Id;
+                    toadd.Summary = item.Summary.Text;
+                    bool isThisAQuestion = false;
+                    SOQuestion toaddquestion = new SOQuestion(toadd);
+                    if (item.Categories.Count != 0)
+                    {
+                        isThisAQuestion = true;
+                    }
+                    foreach (SyndicationCategory cat in item.Categories)
+                    {
+                        toaddquestion.Tags += cat.Name + ",";
+                        toaddquestion.Tags.Remove(toaddquestion.Tags.LastIndexOf(','));
+
+                    }
+
+                    try
+                    {
+
+                        // the extensions assume that there can be more than one value, so get
+                        // the first or default value (default == 0)
+                        int rank = item.ElementExtensions
+                                        .ReadElementExtensions<int>("rank", "http://purl.org/atompub/rank/1.0")[0];
+
+                        toadd.VoteCount = rank;
+                    }
+                    catch
+                    {
+                        //It's a comment! No "rank" element.
+                    }
+                    toaddquestion.VoteCount = toadd.VoteCount;
+
+                    if (isThisAQuestion)
+                    {
+                        Activity.Add(toaddquestion);
+                    }
+                    else
+                    {
+                        Activity.Add(toadd);
+                    }
+                    toadd = null;
+                    toaddquestion = null;
+                }
             }
+            
             return Activity;
 
 
@@ -310,26 +385,64 @@ namespace SOApiDotNet
         /// <param name="numQuestion">Question ID</param>
         /// <param name="site">Trilogy site in question</param>
         /// <returns>A list of posts that are included in the activity corresponding to the question site and ID provided.</returns>
-        public static List<Post> GetQuestionActivity(long numQuestion, TrilogySite site)
+        public static List<SOPost> GetQuestionActivity(long numQuestion, TrilogySite site)
         {
-            List<Post> Activity = new List<Post>();
-            RssFeed feed = RssFeed.Load(string.Format("http://{0}.com/feeds/question/{1}", GetSiteUrl(site), numQuestion));
-            RssChannel channel = (RssChannel)feed.Channels[0];
-            foreach (RssItem item in channel.Items)
+            List<SOPost> Activity = new List<SOPost>();
+            // load the raw feed
+            using (var xmlr = XmlReader.Create(string.Format("http://{0}.com/feeds/question/{1}", GetSiteUrl(site), numQuestion)))
             {
-                Post toadd = new Post();
-                foreach (RssCategory cat in item.Categories)
-                {
-                    toadd.Categories.Add(cat.Name);
-                }
-                toadd.Author = item.Author;
-                toadd.CreatedDate = ConvertToUnixTimestamp(item.PubDate).ToString();
-                toadd.Id = item.Link.Url.ToString();
-                toadd.Link = item.Link.Url.ToString();
-                toadd.Summary = item.Description;
+                // get the items within a feed
+                var feedItems = SyndicationFeed
+                                    .Load(xmlr)
+                                    .GetRss20Formatter()
+                                    .Feed
+                                    .Items;
 
-                //TODO: OTHER PROPERTIES
-                Activity.Add(toadd);
+                // print out details about each item in the feed
+                foreach (var item in feedItems)
+                {
+                    SOPost toadd = new SOPost();
+                    toadd.Title = item.Title.Text;
+                    toadd.Author = item.Authors[0].Name;
+                    toadd.Id = item.Id;
+                    toadd.CreatedDate = item.PublishDate.UtcDateTime;
+                    toadd.LastEditDate = item.LastUpdatedTime.UtcDateTime;
+                    toadd.Link = item.Id;
+                    toadd.Summary = item.Summary.Text;
+                    bool isThisAQuestion = false;
+                    SOQuestion toaddquestion = new SOQuestion(toadd);
+                    if (item.Categories.Count != 0)
+                    {
+                        isThisAQuestion = true;
+                    }
+                    foreach (SyndicationCategory cat in item.Categories)
+                    {
+                        toaddquestion.Tags += cat.Name + ",";
+                        toaddquestion.Tags.Remove(toaddquestion.Tags.LastIndexOf(','));
+
+                    }
+
+
+
+                    // the extensions assume that there can be more than one value, so get
+                    // the first or default value (default == 0)
+                    int rank = item.ElementExtensions
+                                    .ReadElementExtensions<int>("rank", "http://purl.org/atompub/rank/1.0")[0];
+
+                    toadd.VoteCount = rank;
+                    toaddquestion.VoteCount = toadd.VoteCount;
+
+                    if (isThisAQuestion)
+                    {
+                        Activity.Add(toaddquestion);
+                    }
+                    else
+                    {
+                        Activity.Add(toadd);
+                    }
+                    toadd = null;
+                    toaddquestion = null;
+                }
             }
             return Activity;
 
@@ -342,26 +455,51 @@ namespace SOApiDotNet
         /// <param name="tagname">Name of the tag in question.</param>
         /// <param name="site">Trilogy site in question.</param>
         /// <returns>Recent questions in that tag for the site provided.</returns>
-        public static List<Question> GetTagQuestions(string tagname, TrilogySite site)
+        public static List<SOQuestion> GetTagQuestions(string tagname, TrilogySite site)
         {
-            List<Question> questions = new List<Question>();
-            RssFeed feed = RssFeed.Load(string.Format("http://{0}.com/feeds/tag/{1}", GetSiteUrl(site), Uri.EscapeUriString(tagname.Trim())));
-            RssChannel channel = (RssChannel)feed.Channels[0];
-            foreach (RssItem item in channel.Items)
+            List<SOQuestion> questions = new List<SOQuestion>();
+            // load the raw feed
+            using (var xmlr = XmlReader.Create(string.Format("http://{0}.com/feeds/tag/{1}", GetSiteUrl(site), Uri.EscapeUriString(tagname.Trim()))))
             {
-                Question toadd = new Question();
-                foreach (RssCategory cat in item.Categories)
-                {
-                    toadd.Categories.Add(cat.Name);
-                }
-                toadd.Author = item.Author;
-                toadd.CreatedDate = ConvertToUnixTimestamp(item.PubDate).ToString();
-                toadd.Id = item.Link.Url.ToString();
-                toadd.Link = item.Link.Url.ToString();
-                toadd.Summary = item.Description;
+                // get the items within a feed
+                var feedItems = SyndicationFeed
+                                    .Load(xmlr)
+                                    .GetRss20Formatter()
+                                    .Feed
+                                    .Items;
 
-                //TODO: OTHER PROPERTIES
-                questions.Add(toadd);
+                // print out details about each item in the feed
+                foreach (var item in feedItems)
+                {
+                    SOQuestion toaddquestion = new SOQuestion();
+                    toaddquestion.Title = item.Title.Text;
+                    toaddquestion.Author = item.Authors[0].Name;
+                    toaddquestion.Id = item.Id;
+                    //toaddquestion.Categories = item.Categories;
+                    toaddquestion.CreatedDate = item.PublishDate.UtcDateTime;
+                    toaddquestion.LastEditDate = item.LastUpdatedTime.UtcDateTime;
+                    toaddquestion.Link = item.Id;
+                    toaddquestion.Summary = item.Summary.Text;
+                    foreach (SyndicationCategory cat in item.Categories)
+                    {
+                        toaddquestion.Tags += cat.Name + ",";
+
+
+                    }
+                    toaddquestion.Tags.Remove(toaddquestion.Tags.LastIndexOf(','));
+
+
+                    // the extensions assume that there can be more than one value, so get
+                    // the first or default value (default == 0)
+                    int rank = item.ElementExtensions
+                                    .ReadElementExtensions<int>("rank", "http://purl.org/atompub/rank/1.0")[0];
+
+                    toaddquestion.VoteCount = rank;
+
+
+                    questions.Add(toaddquestion);
+                    toaddquestion = null;
+                }
             }
 
 
@@ -463,6 +601,10 @@ namespace SOApiDotNet
                         if ((ex.Response as HttpWebResponse).StatusCode == HttpStatusCode.NotFound)
                         {
                             return null;
+                        }
+                        if ((ex.Response as HttpWebResponse).StatusCode == HttpStatusCode.Forbidden)
+                        {
+                            throw new ApplicationException("Rate-limited. Please reduce your impact load on the Stack Overflow servers.");
                         }
                     }
 

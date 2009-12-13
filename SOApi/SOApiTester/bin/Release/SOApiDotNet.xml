@@ -1,0 +1,399 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SOApiDotNet</name>
+    </assembly>
+    <members>
+        <member name="T:SOApiDotNet.TrilogySite">
+            <summary>
+            An enumeration representing different Stack Overflow sites.
+            </summary>
+        </member>
+        <member name="F:SOApiDotNet.TrilogySite.SO">
+            <summary>
+            stackoverflow.com
+            </summary>
+        </member>
+        <member name="F:SOApiDotNet.TrilogySite.SF">
+            <summary>
+            serverfault.com
+            </summary>
+        </member>
+        <member name="F:SOApiDotNet.TrilogySite.SU">
+            <summary>
+            superuser.com
+            </summary>
+        </member>
+        <member name="F:SOApiDotNet.TrilogySite.Meta">
+            <summary>
+            meta.stackoverflow.com
+            </summary>
+        </member>
+        <member name="T:SOApiDotNet.SortRule">
+            <summary>
+            An enumeration representing sort rules of pages.
+            </summary>
+        </member>
+        <member name="F:SOApiDotNet.SortRule.recent">
+            <summary>
+            Sorting by recent changes/updates
+            </summary>
+        </member>
+        <member name="F:SOApiDotNet.SortRule.views">
+            <summary>
+            Sorting by view count
+            </summary>
+        </member>
+        <member name="F:SOApiDotNet.SortRule.newest">
+            <summary>
+            Sorting by time
+            </summary>
+        </member>
+        <member name="F:SOApiDotNet.SortRule.votes">
+            <summary>
+            Sorting by vote count.
+            </summary>
+        </member>
+        <member name="T:SOApiDotNet.StackOverflow">
+            <summary>
+            The main class that handles the Stack Overflow API.
+            </summary>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.GetUserIdsFromUsername(System.String,SOApiDotNet.TrilogySite)">
+            <summary>
+            Provides all userids of users that have a certain display name.
+            </summary>
+            <param name="username">The display name in question.</param>
+            <param name="site">Trilogy site in question.</param>
+            <returns>A list of all the userids, in Long format. Next, you should obtain user flair to find the right user.</returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.GetUserFavorites(System.Int64,System.Int32,System.Int64,SOApiDotNet.SortRule,SOApiDotNet.TrilogySite)">
+            <summary>
+            Obtains a user's favorites.
+            </summary>
+            <param name="userid">Userid of the user in question.</param>
+            <param name="page">Page #.</param>
+            <param name="pagesize">Page size.</param>
+            <param name="sort">SortRule of the page.</param>
+            <param name="site">Trilogy site in question.</param>
+            <returns>A list of SOFavorite's for the user in question.</returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.GetUserFavorites(System.Int64,SOApiDotNet.TrilogySite)">
+            <summary>
+            Obtains a user's favorites with default parameters (i.e. 100000 per page)
+            </summary>
+            <param name="userid">Id of the user.</param>
+            <param name="site">Trilogy site in question.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.UserReputationGraph(System.Int64,System.Double,System.Double,SOApiDotNet.TrilogySite)">
+            <summary>
+            Obtains reputation changes for a user.
+            </summary>
+            <param name="userid">Id of the user.</param>
+            <param name="fromtime">Starting time, expressed as a double (Unix timestamp).</param>
+            <param name="totime">Ending time, expressed as a double (Unix timestamp).</param>
+            <param name="site">Trilogy site in question.</param>
+            <returns>A list of RepChange's for the user.</returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.UserReputationGraph(System.Int64,System.DateTime,System.DateTime,SOApiDotNet.TrilogySite)">
+            <summary>
+            Obtains reputation changes for a user.
+            </summary>
+            <param name="userid">Id of the user.</param>
+            <param name="fromtime">Starting time, expressed as a DateTime. Maximum of 90 days between this and ending time is allowed.</param>
+            <param name="totime">Ending time, expressed as a DateTime. Maximum of 90 days between this and starting time is allowed.</param>
+            <param name="site">Trilogy site in question.</param>
+            <returns>A list of RepChange's for the user.</returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.GetUserFlair(System.Int64,SOApiDotNet.TrilogySite)">
+            <summary>
+            Obtains a user's flair info.
+            </summary>
+            <param name="userid">Id of the user.</param>
+            <param name="site">Trilogy site in question.</param>
+            <returns>Flair details, expressed through an object of type UserFlair.</returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.GetUserQuestions(System.Int64,System.Int32,System.Int32,SOApiDotNet.SortRule,SOApiDotNet.TrilogySite)">
+            <summary>
+            Obtains a user's questions.
+            </summary>
+            <param name="userid">Id of the user.</param>
+            <param name="page">Page#</param>
+            <param name="pagesize">Size of each page.</param>
+            <param name="sort">SortRule.</param>
+            <param name="site">Trilogy site in question.</param>
+            <returns>An object of type UserQuestions which represents the questions of the user in question.</returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.GetUserAnswers(System.Int64,System.Int32,System.Int32,SOApiDotNet.SortRule,SOApiDotNet.TrilogySite)">
+            <summary>
+            Obtains a user's answers.
+            </summary>
+            <param name="userid">Id of the user.</param>
+            <param name="page">Page #</param>
+            <param name="pagesize">Size of each page.</param>
+            <param name="sort">SortRule.</param>
+            <param name="site">Trilogy site in question.</param>
+            <returns>An object of type UserAnswers which represents the answers of the user in question.</returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.GetRecentQuestions(SOApiDotNet.TrilogySite)">
+            <summary>
+            Utilises recent question feeds to obtain recently updated questions on a certain site.
+            </summary>
+            <param name="site">Trilogy site in question.</param>
+            <returns>A list of objects of type Question, which represents the recent questions on a trilogy site.</returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.GetRecentActivity(System.Int64,SOApiDotNet.TrilogySite)">
+            <summary>
+            Utilises recent user activity feeds to find information regarding activity of a user.
+            </summary>
+            <param name="userid">Userid of the user in question</param>
+            <param name="site">Trilogy site in question</param>
+            <returns>The user's recent activity, expressed in a list of Posts.</returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.GetQuestionActivity(System.Int64,SOApiDotNet.TrilogySite)">
+            <summary>
+            Utilises question activity feeds to extract information about activity (posts) inside questions.
+            </summary>
+            <param name="numQuestion">Question ID</param>
+            <param name="site">Trilogy site in question</param>
+            <returns>A list of posts that are included in the activity corresponding to the question site and ID provided.</returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.GetTagQuestions(System.String,SOApiDotNet.TrilogySite)">
+            <summary>
+            Utilises tag feeds to find questions in a particular tag.
+            </summary>
+            <param name="tagname">Name of the tag in question.</param>
+            <param name="site">Trilogy site in question.</param>
+            <returns>Recent questions in that tag for the site provided.</returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.ConvertToUnixTimestamp(System.DateTime)">
+            <summary>
+            Converts a System.DateTime into a Unix timestamp
+            </summary>
+            <param name="value">The DateTime to convert</param>
+            <returns>Unix timestamp obtained through conversion</returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.ConvertFromUnixTimestamp(System.Double)">
+            <summary>
+            Converts a Unix timestamp into a System.DateTime
+            </summary>
+            <param name="timestamp">The Unix timestamp to convert, as a double</param>
+            <returns>DateTime obtained through conversion</returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.ExtractTimestampFromJsonTime(System.String)">
+            <summary>
+            Extracts a Unix timestamp from a Json time string. I'm not sure whether the JSON library currently used does this automatically or not. Both options are covered. Next, output should be sent to ConvertFromUnixTimestamp(...).
+            </summary>
+            <param name="json">The original JSON date string.</param>
+            <returns>A Unix timestamp, extracted from the JSON date string, expressed as a double.</returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.ExecuteGetCommand(System.String,System.String,System.String)">
+            <summary>
+            Executes an HTTP GET command and retrives the information.		
+            </summary>
+            <param name="url">The URL to perform the GET operation</param>
+            <param name="userName">The username to use with the request</param>
+            <param name="password">The password to use with the request</param>
+            <returns>The response of the request, or null if we got 404 or nothing.</returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.ExecutePostCommand(System.String,System.String,System.String,System.String)">
+            <summary>
+            Executes an HTTP POST command and retrives the information.		
+            This function will automatically include a "source" parameter if the "Source" property is set.
+            </summary>
+            <param name="url">The URL to perform the POST operation</param>
+            <param name="userName">The username to use with the request</param>
+            <param name="password">The password to use with the request</param>
+            <param name="data">The data to post</param> 
+            <returns>The response of the request, or null if we got 404 or nothing.</returns>
+        </member>
+        <member name="M:SOApiDotNet.StackOverflow.GetSiteUrl(SOApiDotNet.TrilogySite)">
+            <summary>
+            Uses the TrilogySite enumeration to obtain a url for each possibility.
+            </summary>
+            <param name="site">Trilogy site in question.</param>
+            <returns>The url of the trilogy site, in string format.</returns>
+        </member>
+        <member name="T:SOApiDotNet.SOPost">
+            <summary>
+            Represents a post on Stack Overflow (question, answer, or comment).
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOPost.Id">
+            <summary>
+            Id (link)
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOPost.VoteCount">
+            <summary>
+            Number of votes.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOPost.ViewCount">
+            <summary>
+            Number of views.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOPost.Title">
+            <summary>
+            Title.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOPost.CreatedDate">
+            <summary>
+            Created date of the post (expressed as a DateTime)
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOPost.LastEditDate">
+            <summary>
+            Last edit date of the post (expressed as a DateTime)
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOPost.Author">
+            <summary>
+            Author of the post.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOPost.Summary">
+            <summary>
+            HTML of the post.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOPost.Link">
+            <summary>
+            URL of the post.
+            </summary>
+        </member>
+        <member name="T:SOApiDotNet.SOFavorite">
+            <summary>
+            Represents a favorite question.
+            </summary>
+        </member>
+        <member name="T:SOApiDotNet.SOQuestion">
+            <summary>
+            Represents a question.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOQuestion.FavCount">
+            <summary>
+            # of favorites.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOQuestion.AnswerCount">
+            <summary>
+            # of answers.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOQuestion.Tags">
+            <summary>
+            Tags.
+            </summary>
+        </member>
+        <member name="T:SOApiDotNet.SORepChange">
+            <summary>
+            Represents a change in reputation for a user.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SORepChange.PostUrl">
+            <summary>
+            Url of the post.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SORepChange.PostTitle">
+            <summary>
+            Title of the post.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SORepChange.Rep">
+            <summary>
+            Rep change from the post.
+            </summary>
+        </member>
+        <member name="T:SOApiDotNet.SOUserFlair">
+            <summary>
+            Represents a user's flair (stats).
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOUserFlair.id">
+            <summary>
+            User id
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOUserFlair.gravatarHtml">
+            <summary>
+            Gravatar image html.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOUserFlair.profileUrl">
+            <summary>
+            Url to the user's profile
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOUserFlair.displayName">
+            <summary>
+            User's display name.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOUserFlair.reputation">
+            <summary>
+            User's rep.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOUserFlair.badgeHtml">
+            <summary>
+            User's badges (html).
+            </summary>
+        </member>
+        <member name="T:SOApiDotNet.SOUserQuestions">
+            <summary>
+            Represents a user's questions (on one page).
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOUserQuestions.Page">
+            <summary>
+            Page #.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOUserQuestions.Total">
+            <summary>
+            Total #.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOUserQuestions.Posts">
+            <summary>
+            List of questions on this page.
+            </summary>
+        </member>
+        <member name="T:SOApiDotNet.SOUserAnswers">
+            <summary>
+            Represents a user's answers (on one page).
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOUserAnswers.Page">
+            <summary>
+            Page #.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOUserAnswers.Total">
+            <summary>
+            Total #.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOUserAnswers.Posts">
+            <summary>
+            List of answers on this page.
+            </summary>
+        </member>
+        <member name="T:SOApiDotNet.SOAnswer">
+            <summary>
+            Represents an answer.
+            </summary>
+        </member>
+        <member name="P:SOApiDotNet.SOAnswer.AcceptedAnswer">
+            <summary>
+            Whether this answer is the accepted one for this question or not.
+            </summary>
+        </member>
+    </members>
+</doc>

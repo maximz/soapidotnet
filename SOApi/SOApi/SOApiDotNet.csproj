@@ -3,14 +3,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{E8ECD8C9-8299-471B-B558-A9AB51EF6351}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SOApiDotNet</RootNamespace>
     <AssemblyName>SOApiDotNet</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -32,36 +32,24 @@
     <DocumentationFile>bin\Release\SOApiDotNet.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Interop.Microsoft.Feeds.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0f6ea8ead6cafa2a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Interop.Microsoft.Feeds.Interop.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Rss.Net, Version=1.0.3617.13808, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Rss.Net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.ServiceModel.Web">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Xml" />
-    <Reference Include="Web20Tools, Version=2.1.0.0, Culture=neutral, PublicKeyToken=226593be22bc1f0c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Web20Tools.dll</HintPath>
-    </Reference>
-    <Reference Include="Web20Tools.Rss, Version=2.1.0.0, Culture=neutral, PublicKeyToken=ad7191991cb71122, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Web20Tools.Rss.dll</HintPath>
-    </Reference>
-    <Reference Include="Web20Tools.Security, Version=2.1.0.0, Culture=neutral, PublicKeyToken=fa8fc7c89d20ef3e, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\Web20Tools.Security.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ObjectClasses.cs" />
+    <Compile Include="ObjectClasses.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StackOverflow.cs" />
   </ItemGroup>
