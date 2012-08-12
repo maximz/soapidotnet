@@ -1,4 +1,4 @@
-**Note:** this library is heavily outdated: it was last updated in December 2009. Since then, the Stack Exchange API has moved from pre-alpha status to a mature version 2. This library works solely for the pre-alpha API. In August 2012, I moved it wholesale from its initial home at Google Code to Github for posterity.
+**Note:** This library is heavily outdated - it was last updated in December 2009. Since then, the Stack Exchange API has moved from pre-alpha status to a mature version 2. This library works solely for the pre-alpha API. In August 2012, I moved it wholesale from its initial home at Google Code to Github for posterity.
 
 This library utilises the continuously-advancing API functions of the Stack Overflow site trilogy. You can find out more about Stack Overflow at http://stackoverflow.com/.
 
