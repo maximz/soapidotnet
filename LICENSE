@@ -11,6 +11,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 For more information about SOApiDotNet, please visit <http://github.com/maximz/soapidotnet>.
 
-  This software uses the following libraries:
+This software uses the following libraries:
 
+ * RSS.NET - Copyright © 2002-2005 ToolButton Inc. All Rights Reserved.
  * JSON.NET - Copyright (c) 2007 James Newton-King.
